@@ -20,13 +20,81 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  
+  constructor(direct) {
+    this.direct = direct;
   }
+
+  vigenereRow = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase().repeat(3).split('');
+
+  encrypt() {
+    if (arguments.length !== 2
+      || typeof arguments[0] !== 'string'
+      || typeof arguments[1] !== 'string') {
+      throw new Error('Incorrect arguments!');
+    }
+
+    let phrase = arguments[0].toUpperCase();
+    let key = arguments[1].toUpperCase();
+    
+    if (key.length < phrase.length) {
+      key = key.repeat(Math.ceil(phrase.length/key.length));
+    }
+    key = key.slice(0, phrase.length);
+
+    [phrase, key] = [phrase.split(''), key.split('')];
+
+    let result = phrase.map((el, i) => {
+      if (this.vigenereRow.indexOf(el) < 0) {
+        key.splice(i, 0, el);
+        return el;
+      } else {
+        return this.vigenereRow[
+          this.vigenereRow.indexOf(el)
+          + this.vigenereRow.indexOf(key[i])
+        ]
+      }
+    });
+
+    return this.direct === false
+    ? result.reverse().join('')
+    : result.join('');
+  }
+  
   decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+    if (arguments.length !== 2
+      || typeof arguments[0] !== 'string'
+      || typeof arguments[1] !== 'string') {
+      throw new Error('Incorrect arguments!');
+    }
+
+    let phrase = arguments[0].toUpperCase();
+    let key = arguments[1].toUpperCase();
+
+    if (key.length < phrase.length) {
+      key = key.repeat(Math.ceil(phrase.length/key.length));
+    }
+    key = key.slice(0, phrase.length);
+
+    [phrase, key] = [phrase.split(''), key.split('')];
+
+    let result = phrase.map((el, i) => {
+      console.log(el, i, key[i]);
+      if (this.vigenereRow.indexOf(el) < 0) {
+        key.splice(i, 0, el);
+        return el;
+      } else {
+        return this.vigenereRow[
+          26
+          + this.vigenereRow.indexOf(el)
+          - this.vigenereRow.indexOf(key[i])
+        ]
+      }
+    });
+
+    return this.direct === false
+    ? result.reverse().join('')
+    : result.join('');
   }
 }
 
